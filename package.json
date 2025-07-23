@@ -1,0 +1,33 @@
+{
+  "name": "test2",
+  "version": "1.0.0",
+  "main": "index.js",
+  "scripts": {
+    "start": "node dist/server.js",
+    "build": "tsc",
+    "dev": "nodemon",
+    "watch": "tsc -w"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "description": "",
+  "devDependencies": {
+    "@types/adm-zip": "^0.5.7",
+    "@types/express": "^5.0.3",
+    "@types/multer": "^2.0.0",
+    "@types/node": "^24.1.0",
+    "@types/pdf-parse": "^1.1.5",
+    "nodemon": "^3.1.10",
+    "ts-node": "^10.9.2",
+    "typescript": "^5.8.3"
+  },
+  "dependencies": {
+    "adm-zip": "^0.5.16",
+    "date-fns": "^4.1.0",
+    "express": "^5.1.0",
+    "multer": "^2.0.2",
+    "node-schedule": "^2.1.1",
+    "pdf-parse": "^1.1.1"
+  }
+}
