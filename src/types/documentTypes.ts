@@ -40,20 +40,16 @@ export interface AnalysisResult {
     documents: DocumentInfo[];
     missing: DocumentType[];
     expired: DocumentInfo[];
+    logs?: string[];
 }
 
 export const DOCUMENT_CONFIG: DocumentConfig = {
     KBIS: {
-        patterns: [
-            /kbis/i,
-            /extrait k/i,
-            /registre du commerce/i,
-            /extrait [kd].?n.o?.?[0-9]+/i
-        ],
+        patterns: [/kbis/i, /extrait k/i],
         datePatterns: [
-            /(?:date\s*d'?émission|émis\s*le|delivré\s*le)\s*[:]?\s*(\d{1,2}\/\d{1,2}\/\d{4})/i,
-            /(?:le)\s*(\d{1,2}\/\d{1,2}\/\d{4})/i,
-            /(date)\s*(\d{2}\/\d{2}\/\d{4})/i
+            /(?:date d'?emission|emis le)\s*:?\s*(\d{2}\/\d{2}\/\d{4})/i, // Accepte ":" optionnel
+            /valable jusqu['au]\s*:?\s*(\d{2}\/\d{2}\/\d{4})/i, // Capture la date de validité
+            /(\d{2}\/\d{2}\/\d{4})(?=[^\d]*$)/i // Dernière date dans le document
         ]
     },
     DC1: {
@@ -79,5 +75,5 @@ export const DOCUMENT_CONFIG: DocumentConfig = {
             /(?:fin\s*de\s*validité)\s*(\d{1,2}\/\d{1,2}\/\d{4})/i,
             /(?:couv.*jusqu'au?)\s*(\d{1,2}\/\d{1,2}\/\d{4})/i
         ]
-    }
+    },
 };
