@@ -49,11 +49,11 @@ const ZipUploader: React.FC = () => {
                     const json: AnalysisResponse = JSON.parse(text);
                     setResult(json);
                 } catch {
-                    setError("⚠️ Erreur de format JSON.");
+                    setError("Erreur de format JSON.");
                 }
             }
         } catch (err: any) {
-            setError("❌ Erreur de connexion: " + err.message);
+            setError("Erreur de connexion: " + err.message);
         } finally {
             setLoading(false);
         }
@@ -72,7 +72,7 @@ const ZipUploader: React.FC = () => {
 
             <h2>Résultat</h2>
 
-            {loading && <p style={{ padding: '0.5rem 1rem', backgroundColor: '#4a87c79c', color: '#fff', border: 'none', borderRadius: '4px' }}>Envoi en cours...</p>}
+            {loading && <p style={{ padding: '0.5rem 1rem', backgroundColor: '#4a87c79c', color: '#fff', border: 'none', borderRadius: '4px' }}>Chargement...</p>}
             {error && <pre style={{ color: 'red' }}>{error}</pre>}
 
             {result && (
