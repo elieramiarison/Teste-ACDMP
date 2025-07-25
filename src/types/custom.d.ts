@@ -1,4 +1,3 @@
-// Pour pdf2json
 declare module 'pdf2json' {
     interface PDFParser {
         on(event: 'pdfParser_dataError', callback: (errData: any) => void): void;
@@ -13,7 +12,6 @@ declare module 'pdf2json' {
     export = PDFParser;
 }
 
-// Pour pdf-lib (si vous l'utilisez)
 declare module 'pdf-lib' {
     export * from 'pdf-lib/types/api';
 }

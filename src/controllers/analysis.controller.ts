@@ -13,7 +13,7 @@ export class AnalysisController {
             const result = await analyzerService.analyze(req.file.path);
             return res.json(result);
         } catch (error) {
-            console.error('Analysis error:', error);
+            console.error('Analyse erreur:', error);
             return res.status(500).json({
                 error: error instanceof Error ? error.message : 'Unknown error occurred'
             });

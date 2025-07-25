@@ -18,16 +18,23 @@
     "@types/multer": "^2.0.0",
     "@types/node": "^24.1.0",
     "@types/pdf-parse": "^1.1.5",
+    "@types/pdfjs-dist": "^2.10.378",
     "nodemon": "^3.1.10",
     "ts-node": "^10.9.2",
     "typescript": "^5.8.3"
   },
   "dependencies": {
+    "@types/cors": "^2.8.19",
     "adm-zip": "^0.5.16",
+    "cors": "^2.8.5",
     "date-fns": "^4.1.0",
     "express": "^5.1.0",
     "multer": "^2.0.2",
     "node-schedule": "^2.1.1",
-    "pdf-parse": "^1.1.1"
+    "pdf-lib": "^1.17.1",
+    "pdf-parse": "^1.1.1",
+    "pdf-poppler": "^0.2.1",
+    "pdfjs-dist": "^5.3.93",
+    "tesseract.js": "^6.0.1"
   }
 }
