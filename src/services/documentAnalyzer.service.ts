@@ -4,8 +4,14 @@ import path from 'path';
 import { isDateExpired } from '../utils/dateUtils';
 import { extractTextFromPDF } from '../utils/pdfParser.util';
 import { detectDocumentType, findExpirationDate } from '../utils/documentUtils.util';
-import { DocumentConfig, DocumentType, AnalysisResult, DocumentInfo } from '../types/documentTypes';
+import {
+    DocumentConfig,
+    DocumentType,
+    AnalysisResult,
+    DocumentInfo
+} from '../types/documentTypes';
 
+// Configuration des types de documents et expressions régulières associées
 export const DOCUMENT_CONFIG: DocumentConfig = {
     KBIS: {
         patterns: [/kbis/i, /extrait k/i],
@@ -25,6 +31,7 @@ export const DOCUMENT_CONFIG: DocumentConfig = {
     }
 };
 
+// Attente que le fichier soit bien extrait avant lecture
 function waitForFile(filePath: string, timeout = 1000): Promise<void> {
     return new Promise((resolve, reject) => {
         const start = Date.now();
@@ -34,7 +41,7 @@ function waitForFile(filePath: string, timeout = 1000): Promise<void> {
                 resolve();
             } else if (Date.now() - start > timeout) {
                 clearInterval(interval);
-                reject(new Error("Fichier pas prêt: " + filePath));
+                reject(new Error(`Fichier pas prêt : ${filePath}`));
             }
         }, 50);
     });
@@ -46,34 +53,32 @@ export class DocumentAnalyzerService {
         const zipEntries = zip.getEntries();
         const tempDir = path.join(__dirname, '../../temp');
 
-        if (!fs.existsSync(tempDir)) {
-            fs.mkdirSync(tempDir, { recursive: true });
-        }
+        fs.mkdirSync(tempDir, { recursive: true });
 
         const logs: string[] = [];
-        const log = (message: string) => {
-            console.log(message);
-            logs.push(message);
+        const log = (msg: string) => {
+            logs.push(msg);
         };
 
         const result: AnalysisResult = {
             documents: [],
             missing: Object.keys(DOCUMENT_CONFIG) as DocumentType[],
             expired: [],
+            logs
         };
 
         for (const entry of zipEntries) {
-            const normalizedEntryName = entry.entryName.replace(/\\/g, '/');
-            const filename = path.basename(normalizedEntryName);
-            log(`🗂️  Fichier trouvé : ${filename}`);
+            const normalizedName = entry.entryName.replace(/\\/g, '/');
+            const filename = path.basename(normalizedName);
+            // log(`Fichier trouvé : ${filename}`);
 
-            if (normalizedEntryName.startsWith('._') || entry.isDirectory) {
-                log(`⏩ Fichier ignoré (macOS ou répertoire): ${normalizedEntryName}`);
+            if (entry.isDirectory || filename.startsWith('._')) {
+                // log(`Fichier ignoré : ${normalizedName}`);
                 continue;
             }
 
             if (!filename.toLowerCase().endsWith('.pdf')) {
-                log(`⏭️  Fichier non-PDF ignoré: ${filename}`);
+                // log(`Fichier non PDF ignoré : ${filename}`);
                 continue;
             }
 
@@ -86,23 +91,20 @@ export class DocumentAnalyzerService {
                 await waitForFile(fullPath);
 
                 const text = await extractTextFromPDF(fullPath);
-                if (!text || text.trim().length === 0) {
-                    log(`⚠️  Aucun texte extrait du fichier: ${filename}`);
+
+                if (!text?.trim()) {
+                    // log(`Aucun texte extrait du fichier : ${filename}`);
                     continue;
                 }
 
                 const docType = detectDocumentType(filename, text, DOCUMENT_CONFIG);
+
                 if (!docType) {
-                    log(`❌ Type non reconnu pour: ${filename}`);
+                    // log(`Type non reconnu pour : ${filename}`);
                     continue;
                 }
 
                 const expirationDate = findExpirationDate(text, DOCUMENT_CONFIG[docType].datePatterns);
-                if (!expirationDate) {
-                    log(`📄 Type détecté: ${docType} - Pas de date trouvée`);
-                } else {
-                    log(`📄 Type détecté: ${docType} - Date: ${expirationDate}`);
-                }
 
                 const docInfo: DocumentInfo = {
                     filename,
@@ -113,24 +115,20 @@ export class DocumentAnalyzerService {
 
                 result.documents.push(docInfo);
                 result.missing = result.missing.filter(type => type !== docType);
+
                 if (expirationDate && !docInfo.isValid) {
                     result.expired.push(docInfo);
                 }
-
-            } catch (error: any) {
-                log(`❗ Erreur avec ${filename}: ${error.message}`);
+            } catch (err: any) {
+                console.log(`Erreur avec ${filename} : ${err.message}`);
             } finally {
                 if (fs.existsSync(fullPath)) {
                     fs.unlinkSync(fullPath);
-                    log(`🧹 Fichier supprimé: ${filename}`);
                 }
             }
         }
 
-        if (fs.existsSync(tempDir)) {
-            fs.rmSync(tempDir, { recursive: true, force: true });
-        }
-
+        fs.rmSync(tempDir, { recursive: true, force: true });
         return result;
     }
 }
